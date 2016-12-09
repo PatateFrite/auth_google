@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Google sign in</title>
+	<meta name="google-signin-client_id" content="16471257433-j5khukq6hid73htne2qicn55v7vm2hro.apps.googleusercontent.com">
+	<meta name="google-signin-scope" content="profile email">
+	<script src="https://apis.google.com/js/platform.js"></script>
+</head>
+
+<body>
+	<div id="signin"></div>
+	<br>
+	<a href="#" onclick="signOut();">Sign out</a>
+	<br>
+	<br>
+	<button onClick="requestResource()">Get secret content</button>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+	<script>
+
+		let id_token = null;
+
+		gapi.signin2.render('signin', {
+			'scope': 'profile email',
+			'onsuccess': (googleUser) => {
+				id_token = googleUser.getAuthResponse().id_token;
+			},
+			'onfailure': (error) => console.log(error)
+		});
+
+	requestResource  = () => {
+		$.get( '/secret', { id_token: id_token })
+		.then((data) => {
+			alert(data);
+		})
+		.catch((err) => {
+			alert(err.responseText)
+			console.error(err)
+		});
+	}
+
+	signOut = () => {
+		const auth2 = gapi.auth2.getAuthInstance();
+		auth2.signOut().then( () => {
+			id_token = null;
+			console.log('User signed out.');
+		});
+	}
+
+	</script>
+</body>
+
+</html>
